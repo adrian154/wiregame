@@ -34,6 +34,8 @@ const game = {
     camera: {x: 0, y: 0, zoomLevel: 0, scale: 1}
 };
 
+const screenToWorld = (sx, sy) => [(sx - game.camera.x) / game.camera.scale, (sy - game.camera.y) / game.camera.scale];
+
 const BG_COLOR = "#242424";
 const CELL_COLORS = {
     [WIRE]: "#9e9e9e",
@@ -61,6 +63,31 @@ const draw = () => {
         ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
     }
 
+    // draw gridlines
+    ctx.strokeStyle = "#ffffff";
+    ctx.globalAlpha = 0.1;
+
+    // get screen coords of top left / bottom right points
+    const [topX, topY] = screenToWorld(0, 0);
+    const [bottomX, bottomY] = screenToWorld(window.innerWidth, window.innerHeight);
+    
+    for(let x = Math.ceil(topX / CELL_SIZE); x <= Math.floor(bottomX / CELL_SIZE); x++) {
+        ctx.beginPath();
+        ctx.moveTo(x * CELL_SIZE, topY);
+        ctx.lineTo(x * CELL_SIZE, bottomY);
+        ctx.closePath();
+        ctx.stroke();
+    }
+
+    for(let y = Math.ceil(topY / CELL_SIZE); y <= Math.floor(bottomY / CELL_SIZE); y++) {
+        ctx.beginPath();
+        ctx.moveTo(topX, y * CELL_SIZE);
+        ctx.lineTo(bottomX, y * CELL_SIZE);
+        ctx.closePath();
+        ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1.0;
     requestAnimationFrame(draw);
 
 };
@@ -71,25 +98,22 @@ const step = () => {
 
 // add pan/zoom events
 const mouse = {down: false, dragging: false};
+const MIN_DELTA = 4;
 
 // (x, y) is in screen coords
 const handleClick = (x, y) => {
-
-    // determine the world coordinates
-    const worldX = (x - game.camera.x) / game.camera.scale,
-          worldY = (y - game.camera.y) / game.camera.scale;
-
+    const [worldX, worldY] = screenToWorld(x, y);
     game.cells.set(getKey(Math.floor(worldX / CELL_SIZE), Math.floor(worldY / CELL_SIZE)), WIRE);
-
 };
 
 canvas.addEventListener("mousedown", event => {
     mouse.down = true;
+    mouse.dragStartX = event.offsetX;
+    mouse.dragStartY = event.offsetY;
 });
 
 window.addEventListener("mousemove", event => {
     if(mouse.down) {
-        mouse.dragging = true;
         game.camera.x += event.movementX;
         game.camera.y += event.movementY;
     }
@@ -97,9 +121,7 @@ window.addEventListener("mousemove", event => {
 
 window.addEventListener("mouseup", event => {
     mouse.down = false;
-    if(mouse.dragging) {
-        mouse.dragging = false;
-    } else {
+    if(Math.abs(event.offsetX - mouse.dragStartX) < MIN_DELTA && Math.abs(event.offsetY - mouse.dragStartY) < MIN_DELTA) {
         handleClick(event.offsetX, event.offsetY);
     }
 });
@@ -107,9 +129,7 @@ window.addEventListener("mouseup", event => {
 const updateScale = (x, y, newScale) => {
     
     const deltaScale = game.camera.scale - newScale;
-    const worldX = (x - game.camera.x) / game.camera.scale,
-          worldY = (y - game.camera.y) / game.camera.scale;
-
+    const [worldX, worldY] = screenToWorld(x, y);
     game.camera.scale = newScale;
 
     // when the user zooms in, we want to zoom towards wherever the cursor currently is
@@ -141,4 +161,5 @@ window.addEventListener("wheel", event => {
     updateScale(event.offsetX, event.offsetY, Math.pow(1.3, game.camera.zoomLevel));
 });
 
+step();
 draw();
