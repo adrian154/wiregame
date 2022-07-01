@@ -43,7 +43,8 @@ const CELL_COLORS = {
     [ELECTRON_HEAD]: "#ffff00",
     [ELECTRON_TAIL]: "#cece4f",
     [SWITCH]: "#3ec742",
-    [ACTIVE_SWITCH]: "#62ff57"
+    [ACTIVE_SWITCH]: "#62ff57",
+    [DELETE]: "#000000"
 };
 
 const CELL_SIZE = 32;
@@ -214,5 +215,49 @@ window.addEventListener("wheel", event => {
     updateScale(event.offsetX, event.offsetY, Math.pow(1.3, game.camera.zoomLevel));
 });
 
+// add ui
+const CELL_NAMES = {
+    [WIRE]: "Wire",
+    [ELECTRON_HEAD]: "Electron Head",
+    [ELECTRON_TAIL]: "Electron Tail",
+    [SWITCH]: "Switch",
+    [ACTIVE_SWITCH]: "Active Switch",
+    [DELETE]: "Delete"
+};
+
+const CELL_KEYBINDS = {
+    [WIRE]: {key: "S", code: "KeyS"},
+    [SWITCH]: {key: "D", code: "KeyD"},
+    [DELETE]: {key: "F", code: "KeyF"},
+    [ELECTRON_HEAD]: {key: "W", code: "KeyW"},
+    [ELECTRON_TAIL]: {key: "E", code: "KeyE"},
+    [ACTIVE_SWITCH]: {key: "R", code: "KeyR"}
+};
+
+for(const type in CELL_COLORS) {
+    
+    const div = document.createElement("div");
+    document.getElementById("palette").append(div);
+    div.addEventListener("click", () => {
+        game.selectedType = type;
+    });
+
+    const button = document.createElement("button");
+    button.classList.add("cell-type-button");
+    button.style.backgroundColor = CELL_COLORS[type];
+    div.append(button, " ", `${CELL_NAMES[type]} (${CELL_KEYBINDS[type].key})`);
+
+}
+
+window.addEventListener("keydown", event => {
+    for(const type in CELL_KEYBINDS) {
+        if(CELL_KEYBINDS[type].code == event.code) {
+            game.selectedType = type;
+            return;
+        }
+    }
+});
+
+// START GAME
 step();
 draw();
