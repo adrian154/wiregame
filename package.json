@@ -1,0 +1,19 @@
+{
+  "name": "wiregame",
+  "version": "1.0.0",
+  "description": "A game where you play with wires",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adrian154/wiregame.git"
+  },
+  "author": "adrian154",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adrian154/wiregame/issues"
+  },
+  "homepage": "https://github.com/adrian154/wiregame#readme"
+}
