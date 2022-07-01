@@ -16,22 +16,23 @@ const WIRE = 0,
       ELECTRON_HEAD = 1,
       ELECTRON_TAIL = 2,
       SWITCH = 3,
-      ACTIVE_SWITCH = 4;
+      ACTIVE_SWITCH = 4,
+      DELETE = 5;
 
 // the board is restricted to 65k x 65k
 const getKey = (x, y) => {
-    if(x < 0 || y < 0 || x > 0xffff || y > 0xffff) {
-        throw new Error("Coordinates out of bounds");
-    }
+    x += 32768;
+    y += 32768;
     return (x & 0xffff) << 16 | y & 0xffff;
 };
 
-const getCoords = key => [key >>> 16, key & 0xffff];
+const getCoords = key => [(key >>> 16) - 32768, (key & 0xffff) - 32768];
 
 // game state
 const game = {
     cells: new Map(),
-    camera: {x: 0, y: 0, zoomLevel: 0, scale: 1}
+    camera: {x: 0, y: 0, zoomLevel: 0, scale: 1},
+    selectedType: WIRE
 };
 
 const screenToWorld = (sx, sy) => [(sx - game.camera.x) / game.camera.scale, (sy - game.camera.y) / game.camera.scale];
@@ -94,6 +95,53 @@ const draw = () => {
 
 const step = () => {
 
+    const updates = [];
+    for(const [key, type] of game.cells) {
+        
+        const [x, y] = getCoords(key);
+        
+        if(type == WIRE) {
+            for(let dx = -1; dx <= 1; dx++) {
+                for(let dy = -1; dy <= 1; dy++) {
+                    if(dx == 0 && dy == 0) continue;
+                    const neighbor = game.cells.get(getKey(x + dx, y + dy));
+                    if(neighbor == ELECTRON_HEAD || neighbor == ACTIVE_SWITCH) {
+                        updates.push([key, ELECTRON_HEAD]);
+                        break;
+                    }
+                }
+            }
+        } else if(type == ELECTRON_HEAD) {
+            updates.push([key, ELECTRON_TAIL]);
+        } else if(type == ELECTRON_TAIL) {
+            updates.push([key, WIRE]);
+        } else if(type == SWITCH) {
+            let numElectrons = 0;
+            for(let dx = -1; dx <= 1; dx++) {
+                for(let dy = -1; dy <= 1; dy++) {
+                    if(dx == 0 && dy == 0) continue;
+                    const neighbor = game.cells.get(getKey(x + dx, y + dy));
+                    if(neighbor == ELECTRON_HEAD || neighbor == ACTIVE_SWITCH) {
+                        numElectrons++;
+                        if(numElectrons == 2) {
+                            updates.push([key, ACTIVE_SWITCH]);
+                            break;
+                        }
+                    }
+                }
+            }
+        } else if(type == ACTIVE_SWITCH) {
+            updates.push([key, SWITCH]);
+        }
+
+    }
+
+    for(const update of updates) {
+        game.cells.set(update[0], update[1]);
+    }
+
+    setTimeout(step, 100);
+
 };
 
 // add pan/zoom events
@@ -103,7 +151,12 @@ const MIN_DELTA = 4;
 // (x, y) is in screen coords
 const handleClick = (x, y) => {
     const [worldX, worldY] = screenToWorld(x, y);
-    game.cells.set(getKey(Math.floor(worldX / CELL_SIZE), Math.floor(worldY / CELL_SIZE)), WIRE);
+    const key = getKey(Math.floor(worldX / CELL_SIZE), Math.floor(worldY / CELL_SIZE));
+    if(game.selectedType == DELETE) {
+        game.cells.delete(key);
+    } else {
+        game.cells.set(key, game.selectedType);
+    }
 };
 
 canvas.addEventListener("mousedown", event => {
