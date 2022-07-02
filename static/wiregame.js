@@ -28,11 +28,26 @@ const getKey = (x, y) => {
 
 const getCoords = key => [(key >>> 16) - 32768, (key & 0xffff) - 32768];
 
+const initMap = () => {
+    return new Map();
+};
+
+const serializeMap = () => {
+    const lines = [];
+    for(const [key, type] of game.cells) {
+        const [x, y] = getCoords(key);
+        lines.push(`${x} ${y} ${type}`);
+    }
+    return lines.join('\n');
+};
+
 // game state
 const game = {
-    cells: new Map(),
+    cells: initMap(),
     camera: {x: 0, y: 0, zoomLevel: 0, scale: 1},
-    selectedType: WIRE
+    selectedType: WIRE,
+    delay: 100,
+    running: true
 };
 
 const screenToWorld = (sx, sy) => [(sx - game.camera.x) / game.camera.scale, (sy - game.camera.y) / game.camera.scale];
@@ -141,42 +156,64 @@ const step = () => {
         game.cells.set(update[0], update[1]);
     }
 
-    setTimeout(step, 100);
+};
 
+const run = () => {
+    if(game.running) {
+        step();
+    }
+    setTimeout(run, game.delay);
 };
 
 // add pan/zoom events
-const mouse = {down: false, dragging: false};
-const MIN_DELTA = 4;
+let ctrlDown = false
+    middleMouseDown = false,
+    mouseDown = false;
 
-// (x, y) is in screen coords
-const handleClick = (x, y) => {
-    const [worldX, worldY] = screenToWorld(x, y);
-    const key = getKey(Math.floor(worldX / CELL_SIZE), Math.floor(worldY / CELL_SIZE));
-    if(game.selectedType == DELETE) {
-        game.cells.delete(key);
-    } else {
-        game.cells.set(key, game.selectedType);
+let lastTileX, lastTileY;
+const handleMouseEvent = event => {
+    const [x, y]  = screenToWorld(event.offsetX, event.offsetY);
+    const tileX = Math.floor(x / CELL_SIZE),
+          tileY = Math.floor(y / CELL_SIZE);
+    if(tileX != lastTileX && tileY != lastTileY) {
+        const key = getKey(tileX, tileY);
+        if(game.selectedType == DELETE) {
+            game.cells.delete(key);
+        } else {
+            game.cells.set(key, game.selectedType);
+        }
     }
 };
 
 canvas.addEventListener("mousedown", event => {
-    mouse.down = true;
-    mouse.dragStartX = event.offsetX;
-    mouse.dragStartY = event.offsetY;
+
+    mouseDown = true;
+    if(event.button == 1) {
+        middleMouseDown = true;
+        return;
+    }
+
+    if(!ctrlDown) {
+        handleMouseEvent(event);   
+    }
+
 });
 
 window.addEventListener("mousemove", event => {
-    if(mouse.down) {
-        game.camera.x += event.movementX;
-        game.camera.y += event.movementY;
+    if(mouseDown) {
+        if(ctrlDown || middleMouseDown) {
+            game.camera.x += event.movementX;
+            game.camera.y += event.movementY;
+        } else {
+            handleMouseEvent(event);
+        }
     }
 });
 
 window.addEventListener("mouseup", event => {
-    mouse.down = false;
-    if(Math.abs(event.offsetX - mouse.dragStartX) < MIN_DELTA && Math.abs(event.offsetY - mouse.dragStartY) < MIN_DELTA) {
-        handleClick(event.offsetX, event.offsetY);
+    mouseDown = false;
+    if(event.button == 1) {
+        middleMouseDown = false;
     }
 });
 
@@ -213,7 +250,8 @@ const updateScale = (x, y, newScale) => {
 window.addEventListener("wheel", event => {
     game.camera.zoomLevel -= event.deltaY / 100;
     updateScale(event.offsetX, event.offsetY, Math.pow(1.3, game.camera.zoomLevel));
-});
+    event.preventDefault();
+}, {passive: false});
 
 // add ui
 const CELL_NAMES = {
@@ -226,11 +264,11 @@ const CELL_NAMES = {
 };
 
 const CELL_KEYBINDS = {
-    [WIRE]: {key: "S", code: "KeyS"},
-    [SWITCH]: {key: "D", code: "KeyD"},
-    [DELETE]: {key: "F", code: "KeyF"},
-    [ELECTRON_HEAD]: {key: "W", code: "KeyW"},
-    [ELECTRON_TAIL]: {key: "E", code: "KeyE"},
+    [WIRE]: {key: "W", code: "KeyW"},
+    [SWITCH]: {key: "S", code: "KeyS"},
+    [DELETE]: {key: "D", code: "KeyD"},
+    [ELECTRON_HEAD]: {key: "E", code: "KeyE"},
+    [ELECTRON_TAIL]: {key: "F", code: "KeyF"},
     [ACTIVE_SWITCH]: {key: "R", code: "KeyR"}
 };
 
@@ -250,14 +288,57 @@ for(const type in CELL_COLORS) {
 }
 
 window.addEventListener("keydown", event => {
+    
     for(const type in CELL_KEYBINDS) {
         if(CELL_KEYBINDS[type].code == event.code) {
             game.selectedType = type;
             return;
         }
     }
+
+    if(event.key === " ") {
+        game.running = !game.running;
+        updatePlayButton();
+    } else if(event.code === "KeyT") {
+        step();
+    } else if(event.key === "Control") {
+        ctrlDown = true;
+    }
+
 });
 
+window.addEventListener("keyup", event => {
+    if(event.key === "Control") {
+        ctrlDown = false;
+    }
+})
+
+const playButton = document.getElementById("toggle-running");
+const updatePlayButton = () => {
+    if(game.running) {
+        playButton.textContent = "\u23f8\ufe0e";
+    } else {
+        playButton.textContent = "\u25b6";
+    }  
+};
+
+playButton.addEventListener("click", event => {
+    game.running = !game.running;
+    updatePlayButton();
+});
+
+document.getElementById("step").addEventListener("click", step);
+
+document.getElementById("rate").addEventListener("input", event => {
+    game.delay = 1000 / event.target.value;
+    document.getElementById("rate-display").textContent = `${event.target.value} / second`;
+});
+
+const about = document.getElementById("about");
+const toggleAbout = () => about.classList.toggle("shown");
+document.getElementById("close").addEventListener("click", toggleAbout);
+document.getElementById("show-about").addEventListener("click", toggleAbout);
+
 // START GAME
-step();
+run();
 draw();

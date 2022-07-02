@@ -9,8 +9,44 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <div id="palette"></div>
+
+        <div id="about" class="shown">
+            <span id="close">[x]</span>
+            <h1>Welcome to WireGame!</h1>
+            <p>
+                WireGame is a simple cell-based "game", where the objective is to build simple digital circuits.
+                As you can see, it's&hellip; uh&hellip; not really a game.
+                But maybe you'll find it fun.
+            </p>
+            <h2>Rules</h2>
+            <p>There are two types of cells: wires and switches. Wires can be charged when at least one cell in the wire's 8 adjacent neighbors is charged. Switches require two neighbors to be charged.</p>
+            <p>The actual behavior of the simulation can be pretty complicated despite its simple rules; the best way to learn how it works is to try building your own creations!</p>
+            <h2>Controls</h2>
+            <ul>
+                <li>Drag with your mouse to place cells; scroll to zoom. Hold <kbd>Ctrl</kbd> or drag with the middle mouse button to pan.</li>
+                <li>Click on cell types in the menu at the top-left or use the indicated keybinds to change the selected type.</li>
+                <li>Click the play/pause button or press <kbd>Space</kbd> to toggle whether the simulation is running. Press <kbd>T</kbd> to single-step the simulation.</li>
+                <li>You can control how fast the simulation runs using the slider at the top.</li>
+            </ul>
+            <p>And most importantly: happy wiring!</p>
+            <p>Oh, and also check out our <a href="https://github.com/adrian154/wiregame">GitHub repo</a>! Beware that some of the CSS is tragically bad.</p>
+        </div>
+
+        <div id="top-left">
+            <button class="control-button" id="toggle-running">&#x23f8;</button>
+            <button class="control-button" id="step">&#x23e9;</button>
+            <div class="control-button" style="display: inline">
+                <span>Rate</span>
+                <input type="range" min="1" max="100" value="10" id="rate">
+                <span id="rate-display">10 / second</span>
+            </div>
+            &nbsp;<button class="control-button" id="show-about">?</div>
+            <br>
+            <div id="palette" style="display: inline-block"></div>
+        </div>
+        
         <canvas id="canvas"></canvas>
         <script src="wiregame.js"></script>
+
     </body>
 </html>

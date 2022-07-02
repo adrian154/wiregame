@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/adrian154/wiregame/issues"
   },
-  "homepage": "https://github.com/adrian154/wiregame#readme"
+  "homepage": "https://github.com/adrian154/wiregame#readme",
+  "dependencies": {
+    "better-sqlite3": "^7.5.3"
+  }
 }
