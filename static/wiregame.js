@@ -21,6 +21,7 @@ const WIRE = 0,
 
 // the board is restricted to 65k x 65k
 const getKey = (x, y) => {
+    if(x < -32768 || x > 32767 || y < -32768 || y > 32767) throw new Error("Coordinates out of bounds");
     x += 32768;
     y += 32768;
     return (x & 0xffff) << 16 | y & 0xffff;
@@ -29,6 +30,15 @@ const getKey = (x, y) => {
 const getCoords = key => [(key >>> 16) - 32768, (key & 0xffff) - 32768];
 
 const initMap = () => {
+    const data = document.getElementById("map-data").dataset.circuit,
+          map = new Map();
+    if(data) {
+        for(const cell of data.split(';')) {
+            const [x, y, type] = cell.split(',');
+            map.set(getKey(Number(x), Number(y)), Number(type));
+        }
+        return map;    
+    }
     return new Map();
 };
 
@@ -36,9 +46,9 @@ const serializeMap = () => {
     const lines = [];
     for(const [key, type] of game.cells) {
         const [x, y] = getCoords(key);
-        lines.push(`${x} ${y} ${type}`);
+        lines.push(`${x},${y},${type}`);
     }
-    return lines.join('\n');
+    return lines.join(';');
 };
 
 // game state
@@ -172,7 +182,7 @@ let ctrlDown = false
 
 let lastTileX, lastTileY;
 const handleMouseEvent = event => {
-    const [x, y]  = screenToWorld(event.offsetX, event.offsetY);
+    const [x, y]  = screenToWorld(event.clientX, event.clientY);
     const tileX = Math.floor(x / CELL_SIZE),
           tileY = Math.floor(y / CELL_SIZE);
     if(tileX != lastTileX && tileY != lastTileY) {
@@ -207,6 +217,7 @@ window.addEventListener("mousemove", event => {
         } else {
             handleMouseEvent(event);
         }
+        event.preventDefault();
     }
 });
 
@@ -249,7 +260,7 @@ const updateScale = (x, y, newScale) => {
 
 window.addEventListener("wheel", event => {
     game.camera.zoomLevel -= event.deltaY / 100;
-    updateScale(event.offsetX, event.offsetY, Math.pow(1.3, game.camera.zoomLevel));
+    updateScale(event.clientX, event.clientY, Math.pow(1.3, game.camera.zoomLevel));
     event.preventDefault();
 }, {passive: false});
 
@@ -335,9 +346,32 @@ document.getElementById("rate").addEventListener("input", event => {
 });
 
 const about = document.getElementById("about");
-const toggleAbout = () => about.classList.toggle("shown");
-document.getElementById("close").addEventListener("click", toggleAbout);
+const toggleAbout = () => {
+    about.classList.toggle("shown");
+    localStorage.setItem("aboutAcknowledged", 1);
+};
+document.getElementById("close-about").addEventListener("click", toggleAbout);
 document.getElementById("show-about").addEventListener("click", toggleAbout);
+
+if(!localStorage.getItem("aboutAcknowledged")) {
+    about.classList.add("shown");
+}
+
+const share = document.getElementById("share");
+const toggleShare = () => share.classList.toggle("shown");
+document.getElementById("close-share").addEventListener("click", toggleShare);
+document.getElementById("show-share").addEventListener("click", toggleShare);
+document.getElementById("share-button").addEventListener("click", event => {
+    event.preventDefault();
+    fetch("/circuit", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            title: document.getElementById("title").value,
+            data: serializeMap()
+        })
+    }).then(resp => resp.json()).then(id => window.location.href = `/?id=${id}`);
+});
 
 // START GAME
 run();

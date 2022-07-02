@@ -3,15 +3,17 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>WireGame</title>
-        <meta property="og:title" content="WireGame">
-        <meta property="og:description" content="A thing where you mess around with wires">
+        <title>$TITLE</title>
+        <meta property="og:title" content="$TITLE">
+        <meta property="og:description" content="$DESCRIPTION">
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
 
-        <div id="about" class="shown">
-            <span id="close">[x]</span>
+        <div id="map-data" data-circuit="$CIRCUIT"></div>
+
+        <div id="about">
+            <span class="close" id="close-about">[x]</span>
             <h1>Welcome to WireGame!</h1>
             <p>
                 WireGame is a simple cell-based "game", where the objective is to build simple digital circuits.
@@ -32,6 +34,16 @@
             <p>Oh, and also check out our <a href="https://github.com/adrian154/wiregame">GitHub repo</a>! Beware that some of the CSS is tragically bad.</p>
         </div>
 
+        <div id="share">
+            <span class="close" id="close-share">[x]</span>
+            <h1>Share Circuit</h1>
+            <p>Sharing your circuit creates a permanent public link to your circuit that anyone on the Internet can view. Viewers can't edit your circuit, but they can create new circuits based on your creation.</p>
+            <form>
+                <input type="text" id="title" placeholder="Title... (optional)">
+                <button type="submit" id="share-button">Share</button>
+            </form>
+        </div>
+
         <div id="top-left">
             <button class="control-button" id="toggle-running">&#x23f8;</button>
             <button class="control-button" id="step">&#x23e9;</button>
@@ -40,11 +52,15 @@
                 <input type="range" min="1" max="100" value="10" id="rate">
                 <span id="rate-display">10 / second</span>
             </div>
-            &nbsp;<button class="control-button" id="show-about">?</div>
             <br>
             <div id="palette" style="display: inline-block"></div>
         </div>
-        
+
+        <div id="top-right">
+            <button class="control-button" id="show-about">?</button>
+            <button class="control-button" id="show-share">share</button>
+        </div>
+
         <canvas id="canvas"></canvas>
         <script src="wiregame.js"></script>
 

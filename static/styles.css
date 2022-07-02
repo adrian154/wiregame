@@ -66,7 +66,7 @@ kbd {
     white-space: nowrap;
 }
 
-#about {
+#about, #share {
     max-width: 40em;
     display: none;
     position: absolute;
@@ -79,7 +79,7 @@ kbd {
     padding: 1.0em;
 }
 
-#about.shown {
+#about.shown, #share.shown {
     display: initial;
 }
 
@@ -87,13 +87,41 @@ a, a:visited {
     color: #ffffff;
 }
 
-#close {
+.close {
     position: absolute;
     top: 1.0em;
     right: 1.0em;
     cursor: pointer;
 }
 
-#close:hover {
+.close:hover {
     text-decoration: underline;
+}
+
+#top-right {
+    position: absolute;
+    top: 1.0em;
+    right: 1.0em;
+    z-index: 1;
+}
+
+input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    color: #000000;
+    font-family: inherit;
+    border: none;
+    background-color: rgba(255, 255, 255, 75%);
+    padding: 0.5rem;
+    outline: none;
+}
+
+#share-button {
+    border: none;
+    background: none;
+    color: #ffffff;
+    font-variant: small-caps;
+    width: 100%;
+    margin-top: 1.0em;
+    padding: 0.5em;
 }
