@@ -6,7 +6,7 @@
         <title>$TITLE</title>
         <meta property="og:title" content="$TITLE">
         <meta property="og:description" content="$DESCRIPTION">
-        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="main.css">
     </head>
     <body>
 
@@ -21,7 +21,7 @@
                 But maybe you'll find it fun.
             </p>
             <h2>Rules</h2>
-            <p>There are two types of cells: wires and switches. Wires can be charged when at least one cell in the wire's 8 adjacent neighbors is charged. Switches require two neighbors to be charged.</p>
+            <p>There are two types of cells: wires and switches. Wires can be charged when at least one cell in the wire's 8 adjacent neighbors is charged. Switches require exactly two neighbors to be charged.</p>
             <p>The actual behavior of the simulation can be pretty complicated despite its simple rules; the best way to learn how it works is to try building your own creations!</p>
             <h2>Controls</h2>
             <ul>
@@ -59,9 +59,11 @@
         <div id="top-right">
             <button class="control-button" id="show-about">?</button>
             <button class="control-button" id="show-share">share</button>
+            <a href="/circuits" target="_blank"><button class="control-button">popular</button></a>
         </div>
 
         <canvas id="canvas"></canvas>
+
         <script src="wiregame.js"></script>
 
     </body>

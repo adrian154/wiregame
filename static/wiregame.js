@@ -17,7 +17,8 @@ const WIRE = 0,
       ELECTRON_TAIL = 2,
       SWITCH = 3,
       ACTIVE_SWITCH = 4,
-      DELETE = 5;
+      DELETE = 5,
+      DELAY = 6;
 
 // the board is restricted to 65k x 65k
 const getKey = (x, y) => {
@@ -69,7 +70,9 @@ const CELL_COLORS = {
     [ELECTRON_TAIL]: "#cece4f",
     [SWITCH]: "#3ec742",
     [ACTIVE_SWITCH]: "#62ff57",
-    [DELETE]: "#000000"
+    [DELETE]: "#000000",
+    [DELAY]: "",
+    [ACTIVE_DELAY]: "#ff5757",
 };
 
 const CELL_SIZE = 32;
@@ -149,12 +152,11 @@ const step = () => {
                     const neighbor = game.cells.get(getKey(x + dx, y + dy));
                     if(neighbor == ELECTRON_HEAD || neighbor == ACTIVE_SWITCH) {
                         numElectrons++;
-                        if(numElectrons == 2) {
-                            updates.push([key, ACTIVE_SWITCH]);
-                            break;
-                        }
                     }
                 }
+            }
+            if(numElectrons == 2) {
+                updates.push([key, ACTIVE_SWITCH]);
             }
         } else if(type == ACTIVE_SWITCH) {
             updates.push([key, SWITCH]);
@@ -330,7 +332,7 @@ const updatePlayButton = () => {
         playButton.textContent = "\u23f8\ufe0e";
     } else {
         playButton.textContent = "\u25b6";
-    }  
+    } 
 };
 
 playButton.addEventListener("click", event => {
@@ -372,6 +374,13 @@ document.getElementById("share-button").addEventListener("click", event => {
         })
     }).then(resp => resp.json()).then(id => window.location.href = `/?id=${id}`);
 });
+
+window.addEventListener("blur", () => {
+    ctrlDown = false;
+    middleMouseDown = false;
+    mouseDown = false;
+});
+
 
 // START GAME
 run();

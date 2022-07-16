@@ -1,0 +1,24 @@
+body {
+    max-width: 60em;
+    margin: 4.0em auto;
+    font-family: monospace;
+    background-color: #262626;
+    color: #ffffff;
+}
+
+h1 {
+    text-align: center;
+    margin: 1.7em 0;
+    padding: 0.5em 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 50%);
+}
+
+#circuits {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5em;
+}
+
+a, a:visited {
+    color: inherit;
+}
