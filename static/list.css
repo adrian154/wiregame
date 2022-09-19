@@ -1,16 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+
 body {
-    max-width: 60em;
+    max-width: 55em;
     margin: 4.0em auto;
-    font-family: monospace;
+    padding: 1em;
+    font-family: "Open Sans", sans-serif;
+    font-size: 11pt;
     background-color: #262626;
     color: #ffffff;
 }
 
-h1 {
-    text-align: center;
-    margin: 1.7em 0;
-    padding: 0.5em 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 50%);
+h1, h2 {
+    font-weight: 500;
 }
 
 #circuits {
@@ -21,4 +22,63 @@ h1 {
 
 a, a:visited {
     color: inherit;
+    text-decoration: none;
+}
+
+p a {
+    text-decoration: underline;
+}
+
+a:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.circuit {
+    background-color: rgba(0, 0, 0, 50%);
+    padding: 1em;
+}
+
+.circuit p {
+    margin-top: 0;
+}
+
+.circuit h2 {
+    margin-bottom: 0;
+}
+
+button {
+    background-color: #59ba59;
+    color: #ffffff;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 0.5em;
+    border-radius: 5px;
+    float: right;
+    margin-bottom: 1.0em;
+    cursor: pointer;
+    outline: none;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+header span {
+    flex-grow: 1;
+}
+
+header button {
+    flex-grow: 0;
+}
+
+img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }

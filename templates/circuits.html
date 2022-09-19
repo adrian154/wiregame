@@ -9,8 +9,10 @@
         <link rel="stylesheet" href="list.css">   
     </head>
     <body>
-        <h1>Popular Circuits</h1>
-        <p><a href="/">Create your own!</a></p>
+        <header>
+            <span>Sort by: <a href="/circuits?sort=views">views</a> / <a href="/circuits?sort=cells">cells</a> / <a href="/circuits?sort=newest">newest</a></span>
+            <a href="/"><button>+ Create your own!</button></a>
+        </header>
         <div id="circuits">$CIRCUITS</div>
     </body>
 </html>

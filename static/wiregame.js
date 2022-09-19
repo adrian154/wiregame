@@ -17,8 +17,7 @@ const WIRE = 0,
       ELECTRON_TAIL = 2,
       SWITCH = 3,
       ACTIVE_SWITCH = 4,
-      DELETE = 5,
-      DELAY = 6;
+      DELETE = 5;
 
 // the board is restricted to 65k x 65k
 const getKey = (x, y) => {
@@ -70,9 +69,7 @@ const CELL_COLORS = {
     [ELECTRON_TAIL]: "#cece4f",
     [SWITCH]: "#3ec742",
     [ACTIVE_SWITCH]: "#62ff57",
-    [DELETE]: "#000000",
-    [DELAY]: "",
-    [ACTIVE_DELAY]: "#ff5757",
+    [DELETE]: "#000000"
 };
 
 const CELL_SIZE = 32;
@@ -329,9 +326,9 @@ window.addEventListener("keyup", event => {
 const playButton = document.getElementById("toggle-running");
 const updatePlayButton = () => {
     if(game.running) {
-        playButton.textContent = "\u23f8\ufe0e";
+        playButton.textContent = "pause";
     } else {
-        playButton.textContent = "\u25b6";
+        playButton.textContent = "play_arrow";
     } 
 };
 
