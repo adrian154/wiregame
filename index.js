@@ -21,7 +21,6 @@ const getMostViewedCircuitsStmt = db.prepare("SELECT id, title, views, cells FRO
       getMostCellsCircuitsStmt = db.prepare("SELECT id, title, views, cells FROM circuits ORDER BY cells DESC"),
       getNewestCircuitsStmt = db.prepare("SELECT id, title, views, cells FROM circuits ORDER BY id DESC");
 
-
 const updatePreviewStatusStmt = db.prepare("UPDATE circuits SET previewExists = 1 WHERE id = ?");
 const generateMissingPreviews = async () => {
     for(const circuit of db.prepare("SELECT * FROM circuits WHERE previewExists = 0").all()) {
@@ -38,6 +37,11 @@ const bodyParser = require("body-parser");
 const app = express();
 
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+});
+
 app.post("/circuit", async (req, res) => {
     
     try {
@@ -75,6 +79,17 @@ app.get("/circuits", (req, res) => {
     })).join("");
     res.header("content-type", "text/html").send(circuitsTemplate.replace("$NUM_CIRCUITS", circuits.length).replace("$CIRCUITS", html));
 });
+
+app.get("/api/circuits/:id", (req, res) => {
+    const row = getCircuitStmt.get(req.params.id);
+    if(row) {
+        res.json(row);
+    } else {
+        res.sendStatus(404);
+    }
+});
+
+app.get("/api/circuits", (req, res) => res.json(getNewestCircuitsStmt.all()));
 
 const indexTemplate = fs.readFileSync("templates/index.html", "utf-8");
 app.get("/", (req, res) => {

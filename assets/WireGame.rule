@@ -1,0 +1,47 @@
+@RULE WireGame
+
+https://wiregame.bithole.dev/
+
+@TABLE
+
+n_states:6
+neighborhood:Moore
+symmetries:permute
+var a={5,1,2,3,4,0}
+var b={5,1,2,3,4,0}
+var c={5,1,2,3,4,0}
+var d={5,1,2,3,4,0}
+var e={5,1,2,3,4,0}
+var f={5,1,2,3,4,0}
+var g={5,1,2,3,4,0}
+var h={5,1,2,3,4,0}
+var i={5,2,3,0}
+var j={5,2,3,0}
+var k={5,2,3,0}
+var l={5,2,3,0}
+var m={5,2,3,0}
+var n={5,2,3,0}
+var o={1,4}
+5,o,b,c,d,e,f,g,h,1
+1,a,b,c,d,e,f,g,h,2
+2,a,b,c,d,e,f,g,h,5
+3,o,o,i,j,k,l,m,n,4
+4,a,b,c,d,e,f,g,h,3
+
+@names
+
+5 wire
+1 electron head
+2 electron tail
+3 switch
+4 active switch
+0 delete
+
+@COLORS
+
+5 158 158 158
+1 255 255 0
+2 206 206 79
+3 62 199 66
+4 98 255 87
+0 36 36 36
