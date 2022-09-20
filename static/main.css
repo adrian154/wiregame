@@ -81,8 +81,9 @@ container {
 
 #about {
     z-index: 2;
-    background-color: rgba(0, 0, 0, 95%);
+    display: none;
     color: #ffffff;
+    background-color: rgba(0, 0, 0, 95%);
     padding: 1em;
     font-size: 14px;
 }
