@@ -73,7 +73,22 @@ kbd {
     white-space: nowrap;
 }
 
-#about, #share {
+container {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+#about {
+    z-index: 2;
+    background-color: rgba(0, 0, 0, 95%);
+    color: #ffffff;
+    padding: 1em;
+    font-size: 14px;
+}
+
+
+ #share {
     max-width: 40em;
     display: none;
     position: absolute;
