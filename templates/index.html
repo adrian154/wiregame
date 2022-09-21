@@ -1,66 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$TITLE</title>
-    <meta property="og:title" content="$TITLE">
-    <meta property="og:description" content="$DESCRIPTION">
-    <meta property="og:image" content="$PREVIEW_URL">
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  </head>
-  <body>
-    <div id="map-data" data-circuit="$CIRCUIT"></div>
-    <div class="container">
-      <div id="about" class="shown">
-        <span class="close" id="close-about" style="
-">[x]</span>
-        <h1>Welcome to WireGame!</h1>
-        <p> WireGame is a 2D sandbox where you can build circuits using wires and switches. </p>
-        <h2>How It Works</h2>
-        <p> There are two types of cells: wires and switches. Wires turn on when any of its 8 neighbors are charged. Switches turn on when exactly two neighbors are charged. </p>
-        <p> Though the rules seem simple, complex behaviors can arise. Try building something, or check out <a href="https://wiregame.bithole.dev/circuits">other people's creations</a>! </p>
-        <h2>Controls</h2>
-        <ul>
-          <li> Drag with your mouse to place cells. Scroll to zoom. Hold <kbd>Ctrl</kbd> or drag with the middle mouse button to pan. </li>
-          <li> Click on cell types in the menu at the top-left or use the indicated keybinds to change the selected type. </li>
-          <li> Click the play/pause button or press <kbd>Space</kbd> to toggle whether the simulation is running. Press <kbd>T</kbd> to single-step the simulation. </li>
-          <li> You can control how fast the simulation runs using the slider at the top. </li>
-        </ul>
-        <p>And most importantly: happy wiring!</p>
-        <p>Oh, and also check out our <a href="https://github.com/adrian154/wiregame">GitHub repo</a>. Beware that some of the code is pretty bad. </p>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>$TITLE</title>
+        <meta property="og:title" content="$TITLE">
+        <meta property="og:description" content="$DESCRIPTION">
+        <meta property="og:image" content="$PREVIEW_URL">
+        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    </head>
+    <body>
+
+        <div id="map-data" data-circuit="$CIRCUIT"></div>
+
+        <div id="about">
+            <span class="close" id="close-about">[x]</span>
+            <h1>Welcome to WireGame!</h1>
+            <p>
+                WireGame is a 2D sandbox where you can build circuits using wires and switches.
+            </p>
+            <h2>How It Works</h2>
+            <p>
+                There are two types of cells: wires and switches.
+                Wires turn on when any of its 8 neighbors are charged.
+                Switches turn on when exactly two neighbors are charged.
+            </p>
+            <p>
+                Though the rules seem simple, complex behaviors can arise.
+                Try building something, or check out <a href="https://wiregame.bithole.dev/circuits">other people's creations</a>!
+            </p>
+            <h2>Controls</h2>
+            <ul>
+                <li>
+                    Drag with your mouse to place cells. Scroll to zoom.
+                    Hold <kbd>Ctrl</kbd> or drag with the middle mouse button to pan.
+                </li>
+                <li>
+                    Click on cell types in the menu at the top-left or use the indicated keybinds to change the selected type.
+                </li>
+                <li>
+                    Click the play/pause button or press <kbd>Space</kbd> to toggle whether the simulation is running.
+                    Press <kbd>T</kbd> to single-step the simulation.
+                </li>
+                <li>
+                    You can control how fast the simulation runs using the slider at the top.
+                </li>
+            </ul>
+            <p>And most importantly: happy wiring!</p>
+            <p>Oh, and also check out our <a href="https://github.com/adrian154/wiregame">GitHub repo</a>. Beware that some of the code is pretty bad.</p>
+        </div>
+
         <div id="share">
-          <span class="close" id="close-share">[x]</span>
-          <h1>Share Circuit</h1>
-          <p>Sharing your circuit creates a permanent public link to your circuit that anyone on the Internet can view. Viewers can't edit your circuit, but they can create new circuits based on your creation.</p>
-          <form>
-            <input type="text" id="title" placeholder="Title... (optional)">
-            <button type="submit" id="share-button">Share</button>
-          </form>
+            <span class="close" id="close-share">[x]</span>
+            <h1>Share Circuit</h1>
+            <p>Sharing your circuit creates a permanent public link to your circuit that anyone on the Internet can view. Viewers can't edit your circuit, but they can create new circuits based on your creation.</p>
+            <form>
+                <input type="text" id="title" placeholder="Title... (optional)">
+                <button type="submit" id="share-button">Share</button>
+            </form>
         </div>
+
         <div id="top-left">
-          <button class="control-button material-symbols-outlined" id="toggle-running">pause</button>
-          <button class="control-button material-symbols-outlined" id="step">skip_next</button>
-          <div class="control-button" style="display: inline">
-            <span>Rate</span>
-            <input type="range" min="1" max="100" value="10" id="rate">
-            <span id="rate-display">10 / second</span>
-          </div>
-          <br>
-          <div id="palette" style="display: inline-block"></div>
+            <button class="control-button material-symbols-outlined" id="toggle-running">pause</button>
+            <button class="control-button material-symbols-outlined" id="step">skip_next</button>
+            <div class="control-button" style="display: inline">
+                <span>Rate</span>
+                <input type="range" min="1" max="100" value="10" id="rate">
+                <span id="rate-display">10 / second</span>
+            </div>
+            <br>
+            <div id="palette" style="display: inline-block"></div>
         </div>
+
         <div id="top-right">
-          <a href="/">
-            <button class="control-button">new</button>
-          </a>
-          <button class="control-button" id="show-about">info</button>
-          <button class="control-button" id="show-share">share</button>
-          <a href="/circuits" target="_blank">
-            <button class="control-button">browse</button>
-          </a>
+            <a href="/"><button class="control-button">new</button></a>
+            <button class="control-button" id="show-about">info</button>
+            <button class="control-button" id="show-share">share</button>
+            <a href="/circuits" target="_blank"><button class="control-button">browse</button></a>
         </div>
+
         <canvas id="canvas"></canvas>
+
         <script src="wiregame.js"></script>
-  </body>
+
+    </body>
 </html>
