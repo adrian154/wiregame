@@ -20,11 +20,10 @@
             <p>
                 WireGame is a 2D sandbox where you can build circuits using wires and switches.
             </p>
-            <h2>How It Works</h2>
             <p>
-                There are two types of cells: wires and switches.
-                Wires turn on when any of its 8 neighbors are charged.
+                Electrons travel through wires.
                 Switches turn on when exactly two neighbors are charged.
+                Cross-overs transmit electrons along the direction they came from.
             </p>
             <p>
                 Though the rules seem simple, complex behaviors can arise.
@@ -33,22 +32,22 @@
             <h2>Controls</h2>
             <ul>
                 <li>
-                    Drag with your mouse to place cells. Scroll to zoom.
-                    Hold <kbd>Ctrl</kbd> or drag with the middle mouse button to pan.
+                    Use the menu at the top-left or the indicated keybinds to select a cell.
                 </li>
                 <li>
-                    Click on cell types in the menu at the top-left or use the indicated keybinds to change the selected type.
+                    Drag with your mouse to place cells. Scroll to zoom.
+                    Hold <kbd>Ctrl</kbd> or the middle mouse button to pan.
                 </li>
                 <li>
                     Click the play/pause button or press <kbd>Space</kbd> to toggle whether the simulation is running.
                     Press <kbd>T</kbd> to single-step the simulation.
                 </li>
                 <li>
-                    You can control how fast the simulation runs using the slider at the top.
+                    You can control how fast the simulation runs using the Rate slider.
                 </li>
             </ul>
             <p>And most importantly: happy wiring!</p>
-            <p>Oh, and also check out our <a href="https://github.com/adrian154/wiregame">GitHub repo</a>. Beware that some of the code is pretty bad.</p>
+            <p>WireGame's code is available on <a href="https://github.com/adrian154/wiregame">GitHub</a>. (It's not pretty, though.)</p>
         </div>
 
         <div id="share">
@@ -70,7 +69,9 @@
                 <span id="rate-display">10 / second</span>
             </div>
             <br>
-            <div id="palette" style="display: inline-block"></div>
+            <div id="palette" style="display: inline-block">
+                <div id="show-all">Show all...</div>
+            </div>
         </div>
 
         <div id="top-right">
@@ -81,6 +82,8 @@
         </div>
 
         <canvas id="canvas"></canvas>
+
+        <span id="perf-stats"></div>
 
         <script src="wiregame.js"></script>
 

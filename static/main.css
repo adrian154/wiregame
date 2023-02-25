@@ -58,6 +58,18 @@ button {
     height: 1rem;
 }
 
+.active {
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+.show-hidden .hidden {
+    display: block;
+}
+
 /* from MDN */
 kbd {
     background-color: #eee;
@@ -136,4 +148,11 @@ input[type="text"] {
 
 h1 {
     font-weight: 500;
+}
+
+#perf-stats {
+    position: fixed;
+    bottom: 0.5em;
+    right: 0.5em;
+    color: #00ff00;
 }
