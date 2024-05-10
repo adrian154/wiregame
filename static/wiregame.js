@@ -4,9 +4,8 @@ const canvas = document.getElementById("canvas"),
 
 // make sure the canvas is always sized correctly
 const onResize = () => {
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 };
 
 window.addEventListener("resize", onResize);
@@ -18,11 +17,7 @@ const WIRE = 0,
       ELECTRON_TAIL = 2,
       SWITCH = 3,
       ACTIVE_SWITCH = 4,
-      CROSSOVER = 5,
-      CROSSOVER_CHARGED_X = 6,
-      CROSSOVER_CHARGED_Y = 7,
-      CROSSOVER_CHARGED_XY = 8,
-      DELETE = 9;
+      DELETE = 5;
 
 // the board is restricted to 65k x 65k
 const getKey = (x, y) => {
@@ -65,14 +60,6 @@ const game = {
     running: true
 };
 
-// keep track of performance states
-const perf = {
-    stepTime: 0,
-    stepTimeCount: 0,
-    drawTime: 0,
-    drawTimeCount: 0
-};
-
 const screenToWorld = (sx, sy) => [(sx - game.camera.x) / game.camera.scale, (sy - game.camera.y) / game.camera.scale];
 
 const BG_COLOR = "#242424";
@@ -82,18 +69,12 @@ const CELL_COLORS = {
     [ELECTRON_TAIL]: "#cece4f",
     [SWITCH]: "#3ec742",
     [ACTIVE_SWITCH]: "#62ff57",
-    [CROSSOVER]: "#3e85c7",
-    [CROSSOVER_CHARGED_X]: "#ff0000",
-    [CROSSOVER_CHARGED_Y]: "#0000ff",
-    [CROSSOVER_CHARGED_XY]: "#ff00ff",
     [DELETE]: "#000000"
 };
 
 const CELL_SIZE = 32;
 
 const draw = () => {
-
-    const start = performance.now();
 
     // draw background
     ctx.resetTransform();
@@ -110,46 +91,35 @@ const draw = () => {
     }
 
     // draw gridlines
-    if(game.camera.scale > 0.1) {
-        ctx.strokeStyle = "#ffffff";
-        ctx.globalAlpha = 0.1;
+    ctx.strokeStyle = "#ffffff";
+    ctx.globalAlpha = 0.1;
 
-        // get screen coords of top left / bottom right points
-        const [topX, topY] = screenToWorld(0, 0);
-        const [bottomX, bottomY] = screenToWorld(window.innerWidth, window.innerHeight);
-        
-        for(let x = Math.ceil(topX / CELL_SIZE); x <= Math.floor(bottomX / CELL_SIZE); x++) {
-            ctx.beginPath();
-            ctx.moveTo(x * CELL_SIZE, topY);
-            ctx.lineTo(x * CELL_SIZE, bottomY);
-            ctx.closePath();
-            ctx.stroke();
-        }
+    // get screen coords of top left / bottom right points
+    const [topX, topY] = screenToWorld(0, 0);
+    const [bottomX, bottomY] = screenToWorld(window.innerWidth, window.innerHeight);
+    
+    for(let x = Math.ceil(topX / CELL_SIZE); x <= Math.floor(bottomX / CELL_SIZE); x++) {
+        ctx.beginPath();
+        ctx.moveTo(x * CELL_SIZE, topY);
+        ctx.lineTo(x * CELL_SIZE, bottomY);
+        ctx.closePath();
+        ctx.stroke();
+    }
 
-        for(let y = Math.ceil(topY / CELL_SIZE); y <= Math.floor(bottomY / CELL_SIZE); y++) {
-            ctx.beginPath();
-            ctx.moveTo(topX, y * CELL_SIZE);
-            ctx.lineTo(bottomX, y * CELL_SIZE);
-            ctx.closePath();
-            ctx.stroke();
-        }
+    for(let y = Math.ceil(topY / CELL_SIZE); y <= Math.floor(bottomY / CELL_SIZE); y++) {
+        ctx.beginPath();
+        ctx.moveTo(topX, y * CELL_SIZE);
+        ctx.lineTo(bottomX, y * CELL_SIZE);
+        ctx.closePath();
+        ctx.stroke();
     }
 
     ctx.globalAlpha = 1.0;
-    perf.drawTime += performance.now() - start;
-    perf.drawTimeCount++;
     requestAnimationFrame(draw);
 
 };
 
-const isCharged = (x, y, dx, dy) => {
-    const neighbor = game.cells.get(getKey(x + dx, y + dy));
-    return neighbor == ELECTRON_HEAD || neighbor == ACTIVE_SWITCH || neighbor == CROSSOVER_CHARGED_XY || neighbor == CROSSOVER_CHARGED_X && dy == 0 || neighbor == CROSSOVER_CHARGED_Y && dx == 0;
-};
-
 const step = () => {
-
-    const start = performance.now();
 
     const updates = [];
     for(const [key, type] of game.cells) {
@@ -160,16 +130,15 @@ const step = () => {
             for(let dx = -1; dx <= 1; dx++) {
                 for(let dy = -1; dy <= 1; dy++) {
                     if(dx == 0 && dy == 0) continue;
-                    if(isCharged(x, y, dx, dy)) {
+                    const neighbor = game.cells.get(getKey(x + dx, y + dy));
+                    if(neighbor == ELECTRON_HEAD || neighbor == ACTIVE_SWITCH) {
                         updates.push([key, ELECTRON_HEAD]);
-                        break; 
+                        break;
                     }
                 }
             }
         } else if(type == ELECTRON_HEAD) {
             updates.push([key, ELECTRON_TAIL]);
-        } else if(type == CROSSOVER_CHARGED_X || type == CROSSOVER_CHARGED_Y || type == CROSSOVER_CHARGED_XY) {
-            updates.push([key, CROSSOVER]);
         } else if(type == ELECTRON_TAIL) {
             updates.push([key, WIRE]);
         } else if(type == SWITCH) {
@@ -177,7 +146,8 @@ const step = () => {
             for(let dx = -1; dx <= 1; dx++) {
                 for(let dy = -1; dy <= 1; dy++) {
                     if(dx == 0 && dy == 0) continue;
-                    if(isCharged(x, y, dx, dy)) {
+                    const neighbor = game.cells.get(getKey(x + dx, y + dy));
+                    if(neighbor == ELECTRON_HEAD || neighbor == ACTIVE_SWITCH) {
                         numElectrons++;
                     }
                 }
@@ -187,15 +157,6 @@ const step = () => {
             }
         } else if(type == ACTIVE_SWITCH) {
             updates.push([key, SWITCH]);
-        } else if(type == CROSSOVER) {
-            const horizontal = isCharged(x, y, -1, 0) || isCharged(x, y, 1, 0),
-                  vertical = isCharged(x, y, 0, -1) || isCharged(x, y, 0, 1);
-            if(horizontal && vertical)
-                updates.push([key, CROSSOVER_CHARGED_XY]);
-            else if(horizontal)
-                updates.push([key, CROSSOVER_CHARGED_X]);
-            else if(vertical)
-                updates.push([key, CROSSOVER_CHARGED_Y]);
         }
 
     }
@@ -203,9 +164,6 @@ const step = () => {
     for(const update of updates) {
         game.cells.set(update[0], update[1]);
     }
-
-    perf.stepTime += performance.now() - start;
-    perf.stepTimeCount++;
 
 };
 
@@ -308,73 +266,42 @@ window.addEventListener("wheel", event => {
 // add ui
 const CELL_NAMES = {
     [WIRE]: "Wire",
-    [ELECTRON_HEAD]: "Electron",
+    [ELECTRON_HEAD]: "Electron Head",
     [ELECTRON_TAIL]: "Electron Tail",
     [SWITCH]: "Switch",
     [ACTIVE_SWITCH]: "Active Switch",
-    [CROSSOVER]: "Cross-over",
-    [CROSSOVER_CHARGED_X]: "Charged cross-over (horizontal)",
-    [CROSSOVER_CHARGED_Y]: "Charged cross-over (vertical)",
-    [CROSSOVER_CHARGED_XY]: "Charged cross-over (both)",
     [DELETE]: "Delete"
 };
-
-const DEFAULT_TYPES = [WIRE, ELECTRON_HEAD, SWITCH, CROSSOVER, DELETE];
 
 const CELL_KEYBINDS = {
     [WIRE]: {key: "W", code: "KeyW"},
     [SWITCH]: {key: "S", code: "KeyS"},
     [DELETE]: {key: "D", code: "KeyD"},
     [ELECTRON_HEAD]: {key: "E", code: "KeyE"},
-    [CROSSOVER]: {key: "F", code: "KeyF"}
+    [ELECTRON_TAIL]: {key: "F", code: "KeyF"},
+    [ACTIVE_SWITCH]: {key: "R", code: "KeyR"}
 };
-
-let selectedTypeDiv = null;
-const typeDivs = {};
-const selectType = type => {
-    game.selectedType = type;
-    selectedTypeDiv?.classList.remove("active");
-    typeDivs[type].classList.add("active");
-    selectedTypeDiv = typeDivs[type];
-};
-
-const paletteElem = document.getElementById("palette"),
-      showAllElem = document.getElementById("show-all");
 
 for(const type in CELL_COLORS) {
-
+    
     const div = document.createElement("div");
-    paletteElem.insertBefore(div, showAllElem);
-    div.addEventListener("click", () => selectType(type));
-    typeDivs[type] = div;
-
-    if(!DEFAULT_TYPES.includes(Number(type))) {
-        div.classList.add("hidden");
-    }
+    document.getElementById("palette").append(div);
+    div.addEventListener("click", () => {
+        game.selectedType = type;
+    });
 
     const button = document.createElement("button");
     button.classList.add("cell-type-button");
     button.style.backgroundColor = CELL_COLORS[type];
+    div.append(button, " ", `${CELL_NAMES[type]} (${CELL_KEYBINDS[type].key})`);
 
-    if(CELL_KEYBINDS[type])
-        div.append(button, " ", `${CELL_NAMES[type]} (${CELL_KEYBINDS[type].key})`);
-    else
-        div.append(button, " ", `${CELL_NAMES[type]}`);
-
-}   
-
-showAllElem.addEventListener("click", () => {
-    if(paletteElem.classList.toggle("show-hidden"))
-        showAllElem.textContent = "Show less...";
-    else
-        showAllElem.textContent = "Show all...";
-});
+}
 
 window.addEventListener("keydown", event => {
     
     for(const type in CELL_KEYBINDS) {
         if(CELL_KEYBINDS[type].code == event.code) {
-            selectType(type);
+            game.selectedType = type;
             return;
         }
     }
@@ -451,15 +378,7 @@ window.addEventListener("blur", () => {
     mouseDown = false;
 });
 
+
 // START GAME
 run();
 draw();
-
-// periodically update performance states
-setInterval(() => {
-    document.getElementById("perf-stats").textContent = `draw: ${Number(perf.drawTime / perf.drawTimeCount).toFixed(1)}ms, step: ${Number(perf.stepTime / perf.stepTimeCount).toFixed(1)}ms`;
-    perf.drawTime = 0;
-    perf.drawTimeCount = 0;
-    perf.stepTime = 0;
-    perf.stepTimeCount = 0;
-}, 1000);
